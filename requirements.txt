@@ -1,0 +1,13 @@
+# server requirements
+flask
+flask_session
+flask_cors
+flask_restful
+flask_bcrypt
+gunicorn
+
+# app requirements
+openai==0.28
+
+# app specific packages
+gget
