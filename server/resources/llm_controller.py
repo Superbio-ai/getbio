@@ -44,7 +44,7 @@ class LLMSessionController:
         
         
 class LLMController:
-    def __init__(self, sid, database: str = 'unspecified', task: str = 'unspecified', wordiness: str = 'concise') -> None:
+    def __init__(self, sid, database: str = 'unspecified', wordiness: str = 'concise') -> None:
         self.sid = str(sid)
         self.langchain_dir = f"/app/chat_history/{self.sid}"
         self.last_used_time = datetime.now()       #updated when used
@@ -55,10 +55,10 @@ class LLMController:
         self.max_tokens = MAX_TOKENS          # for gpt 4 #
         self.status = 'ready'
         self.tokens_left = MAX_TOKENS
-        self.prompt = self.prepare_prompt(database, task, wordiness)
+        self.prompt = self.prepare_prompt(database, wordiness)
     
-    def prepare_prompt(self, database, task, wordiness):
-        self.prompt = f'''Provide me with a python gget command to query {database} for task {task}.
+    def prepare_prompt(self, database, wordiness):
+        self.prompt = f'''Provide me with a python gget command to query {database}.
         Provide {wordiness} responses, and include code.
         Respond to questions which are not related to using gget with 'Sorry I can only help with querying biological databases'.'''
         
@@ -111,8 +111,8 @@ class LLMController:
                 time.sleep(10) # Wait for 5 seconds before retrying
                 
                 
-    def ask_question(self, question, database: str = 'unspecified', task: str = 'unspecified', wordiness: str = 'concise'):
-        self.prepare_prompt(database, task, wordiness)
+    def ask_question(self, question, database: str = 'unspecified', wordiness: str = 'concise'):
+        self.prepare_prompt(database, wordiness)
         self.user_messages.append(question)
         self.prepare_messages()
         
@@ -128,7 +128,7 @@ class LLMController:
 
 
 class ChatBot:
-    def __init__(self, database: str = 'unspecified', task: str = 'unspecified', wordiness: str = 'concise') -> None:
+    def __init__(self, database: str = 'unspecified', wordiness: str = 'concise') -> None:
         self.user_messages = []
         self.responses = []
         self.messages = []
@@ -137,7 +137,7 @@ class ChatBot:
         self.status = 'ready'
         self.tokens_left = MAX_TOKENS
         
-        self.prompt = f'''Provide me with a python gget command to query {database} for task {task}.
+        self.prompt = f'''Provide me with a python gget command to query {database}.
         Provide {wordiness} responses, and include code.
         Respond to questions which are not related to using gget with 'Sorry I can only help with querying biological databases'.'''
         
