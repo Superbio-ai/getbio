@@ -16,17 +16,13 @@ class ChatBotAPI(WrapResource):
             print("SESSION_ID: ", session_id, type(session_id))
             session_llm_controller = self.session_controller.sessions[session_id]
 
-            role = request.json.get('role')
-            language = request.json.get('language')
-            packages_raw = request.json.get('packages')
-            packages = packages_raw.splitlines()
-            wordiness = request.json.get('wordiness')
-            if not session_id or not role or not language or not wordiness:
-                return {"error": "session_id, role, language and wordiness are required."}, 400
-            elif not isinstance(packages, list):
-                return {"error": "packages should be a list / array. It can be empty."}, 400
-            print("Question and prompt details", role, language, packages, wordiness)
-            return session_llm_controller.ask_question(question, role, language, packages, wordiness)
+            database = request.json.get('database')
+            wordiness = "concise"
+            if not session_id or not database or not wordiness:
+                return {"error": "session_id, database and wordiness are required."}, 400
+
+            print("Question and prompt details", database, wordiness)
+            return session_llm_controller.ask_question(database, wordiness)
 
         except KeyError as e:
             print(e)
