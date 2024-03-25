@@ -1,0 +1,68 @@
+import gget
+from Bio import Entrez
+Entrez.email = "smorgan@superbio.ai"
+
+# Fetch all Homo sapiens reference and annotation FTPs from the latest Ensembl release
+results = gget.ref("homo_sapiens")
+
+# Get Ensembl IDs of human genes with "ace2" or "angiotensin converting enzyme 2" in their name/description
+results = gget.search(["ace2", "angiotensin converting enzyme 2"], "homo_sapiens")
+
+# Look up gene ENSG00000130234 (ACE2) and its transcript ENST00000252519
+results = gget.info(["ENSG00000130234", "ENST00000252519"])
+
+# Fetch the amino acid sequence of the canonical transcript of gene ENSG00000130234
+results = gget.seq("ENSG00000130234", translate=True)
+
+# Quickly find the genomic location of (the start of) that amino acid sequence
+results = gget.blat("MSSSSWLLLSLVAVTAAQSTIEEQAKTFLDKFNHEAEDLFYQSSLAS")
+
+# BLAST (the start of) that amino acid sequence
+results = gget.blast("MSSSSWLLLSLVAVTAAQSTIEEQAKTFLDKFNHEAEDLFYQSSLAS")
+
+# Align multiple nucleotide or amino acid sequences against each other
+results = gget.muscle(["MSSSSWLLLSLVAVTAAQSTIEEQAKTFLDKFNHEAEDLFYQSSLAS", "MSSSSWLLLSLVEVTAAQSTIEQQAKTFLDKFHEAEDLFYQSLLAS"])
+
+# Align one or more amino acid sequences against a reference (containing one or more sequences) (local BLAST) (also accepts paths to FASTA files)  
+results = gget.diamond("MSSSSWLLLSLVAVTAAQSTIEEQAKTFLDKFNHEAEDLFYQSSLAS", reference="MSSSSWLLLSLVEVTAAQSTIEQQAKTFLDKFHEAEDLFYQSLLAS")
+
+# Use Enrichr for an ontology analysis of a list of genes
+results = gget.enrichr(["ACE2", "AGT", "AGTR1", "ACE", "AGTRAP", "AGTR2", "ACE3P"], database="ontology", plot=True)
+
+# Get the human tissue expression of gene ACE2
+results = gget.archs4("ACE2", which="tissue")
+
+# Get the protein structure (in PDB format) of ACE2 as stored in the Protein Data Bank (PDB ID returned by gget info)
+results = gget.pdb("1R42", save=True)
+
+# Find Eukaryotic Linear Motifs (ELMs) in a protein sequence
+gget.setup('elm')
+ortho_df, regex_df = gget.elm("MSSSSWLLLSLVAVTAAQSTIEEQAKTFLDKFNHEAEDLFYQSSLAS")
+
+# Fetch a scRNAseq count matrix (AnnData format) based on specified gene(s), tissue(s), and cell type(s) (default species: human)
+gget.setup("cellxgene")
+results = gget.cellxgene(gene = ["ACE2", "SLC5A1"], tissue = "lung", cell_type = "mucus secreting cell")
+
+# Obtain a list of NCBI database names accessible through the Entrez utilities using einfo
+stream = Entrez.einfo()
+results = stream.read()
+
+# Search a database using esearch
+stream = Entrez.esearch(db="pubmed", term="SEARCH_TERM_HERE", retmax="10")
+results = Entrez.read(stream)
+
+# Retrieve document summaries using esummary
+stream = Entrez.esummary(db="nlmcatalog", id="101660833")
+results = Entrez.read(stream)
+
+#EFetch is what you use when you want to retrieve a full record from Entrez
+stream = Entrez.efetch(db="nucleotide", id="EU490707", rettype="gb", retmode="text")
+results = stream.read()
+
+# ELink, available from Biopython as Bio.Entrez.elink(), can be used to find related items in the NCBI Entrez databases. 
+pmid = "19304878"
+results = Entrez.read(Entrez.elink(dbfrom="pubmed", id=pmid))
+
+# EGQuery provides counts for a search term in each of the Entrez databases (i.e. a global query). 
+stream = Entrez.egquery(term="biopython")
+results = Entrez.read(stream)

@@ -11,3 +11,4 @@ openai==0.28
 
 # app specific packages
 gget
+biopython
